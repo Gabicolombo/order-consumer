@@ -1,0 +1,22 @@
+service: order-consumer
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+
+functions:
+  processQueue:
+    handler: handler.consumeQueue
+    events:
+    - sqs:
+        arn:
+          Fn::GetAtt:
+          - OrderQueue
+          - Arn
+
+resources:
+  Resources:
+    OrderQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: Order-consumer
