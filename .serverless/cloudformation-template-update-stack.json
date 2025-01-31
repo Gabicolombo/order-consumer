@@ -107,7 +107,7 @@
       "Properties": {
         "Code": {
           "S3Bucket": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
-          "S3Key": "serverless/order-consumer/dev/1738067543337-2025-01-28T12:32:23.337Z/order-consumer.zip"
+          "S3Key": "serverless/order-consumer/dev/1738258586236-2025-01-30T17:36:26.236Z/order-consumer.zip"
         },
         "Handler": "handler.consumeQueue",
         "Runtime": "nodejs18.x",
@@ -125,14 +125,14 @@
         "ProcessQueueLogGroup"
       ]
     },
-    "ProcessQueueLambdaVersionJEs4EVJEWWPiDapQTTOZ7N7g7Gfd3ttiPYuEAA7a6aM": {
+    "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "ProcessQueueLambdaFunction"
         },
-        "CodeSha256": "xuod3bhjrBJPFsppUUkPwTX/BMJ7slqQaVhfn57pVbA="
+        "CodeSha256": "MdoUc814MjKSl6VWVgqYO2gXASH5KL6LVkz69OwtD/Y="
       }
     },
     "ProcessQueueEventSourceMappingSQSOrderQueue": {
@@ -174,7 +174,7 @@
     "ProcessQueueLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "ProcessQueueLambdaVersionJEs4EVJEWWPiDapQTTOZ7N7g7Gfd3ttiPYuEAA7a6aM"
+        "Ref": "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM"
       },
       "Export": {
         "Name": "sls-order-consumer-dev-ProcessQueueLambdaFunctionQualifiedArn"

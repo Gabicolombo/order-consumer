@@ -1,264 +1,7 @@
 {
-  "C:\\Users\\gabri\\Área de Trabalho\\Documentos\\GitHub\\Serverless\\order-consumer": {
-    "versionSfCore": null,
-    "versionFramework": "4.4.19",
-    "isWithinCompose": false,
-    "isCompose": false,
-    "composeOrgName": null,
-    "composeResolverProviders": {
-      "default-aws-credential-resolver": "<REDACTED>",
-      "sls": {
-        "instance": {
-          "credentials": "<REDACTED>",
-          "serviceConfigFile": {
-            "service": "order-consumer",
-            "provider": {
-              "name": "aws",
-              "runtime": "nodejs18.x",
-              "stage": "dev",
-              "region": "us-east-1",
-              "versionFunctions": true,
-              "compiledCloudFormationTemplate": {
-                "AWSTemplateFormatVersion": "2010-09-09",
-                "Description": "The AWS CloudFormation template for this Serverless application",
-                "Resources": {
-                  "ProcessQueueLogGroup": {
-                    "Type": "AWS::Logs::LogGroup",
-                    "Properties": {
-                      "LogGroupName": "/aws/lambda/order-consumer-dev-processQueue"
-                    }
-                  },
-                  "IamRoleLambdaExecution": {
-                    "Type": "AWS::IAM::Role",
-                    "Properties": {
-                      "AssumeRolePolicyDocument": {
-                        "Version": "2012-10-17",
-                        "Statement": [
-                          {
-                            "Effect": "Allow",
-                            "Principal": {
-                              "Service": [
-                                "lambda.amazonaws.com"
-                              ]
-                            },
-                            "Action": [
-                              "sts:AssumeRole"
-                            ]
-                          }
-                        ]
-                      },
-                      "Policies": [
-                        {
-                          "PolicyName": {
-                            "Fn::Join": [
-                              "-",
-                              [
-                                "order-consumer",
-                                "dev",
-                                "lambda"
-                              ]
-                            ]
-                          },
-                          "PolicyDocument": {
-                            "Version": "2012-10-17",
-                            "Statement": [
-                              {
-                                "Effect": "Allow",
-                                "Action": [
-                                  "logs:CreateLogStream",
-                                  "logs:CreateLogGroup",
-                                  "logs:TagResource"
-                                ],
-                                "Resource": [
-                                  {
-                                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/order-consumer-dev*:*"
-                                  }
-                                ]
-                              },
-                              {
-                                "Effect": "Allow",
-                                "Action": [
-                                  "logs:PutLogEvents"
-                                ],
-                                "Resource": [
-                                  {
-                                    "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/order-consumer-dev*:*:*"
-                                  }
-                                ]
-                              },
-                              {
-                                "Effect": "Allow",
-                                "Action": [
-                                  "sqs:ReceiveMessage",
-                                  "sqs:DeleteMessage",
-                                  "sqs:GetQueueAttributes"
-                                ],
-                                "Resource": [
-                                  {
-                                    "Fn::GetAtt": [
-                                      "OrderQueue",
-                                      "Arn"
-                                    ]
-                                  }
-                                ]
-                              }
-                            ]
-                          }
-                        }
-                      ],
-                      "Path": "/",
-                      "RoleName": {
-                        "Fn::Join": [
-                          "-",
-                          [
-                            "order-consumer",
-                            "dev",
-                            {
-                              "Ref": "AWS::Region"
-                            },
-                            "lambdaRole"
-                          ]
-                        ]
-                      }
-                    }
-                  },
-                  "ProcessQueueLambdaFunction": {
-                    "Type": "AWS::Lambda::Function",
-                    "Properties": {
-                      "Code": {
-                        "S3Bucket": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
-                        "S3Key": "serverless/order-consumer/dev/1738067543337-2025-01-28T12:32:23.337Z/order-consumer.zip"
-                      },
-                      "Handler": "handler.consumeQueue",
-                      "Runtime": "nodejs18.x",
-                      "FunctionName": "order-consumer-dev-processQueue",
-                      "MemorySize": 1024,
-                      "Timeout": 6,
-                      "Role": {
-                        "Fn::GetAtt": [
-                          "IamRoleLambdaExecution",
-                          "Arn"
-                        ]
-                      }
-                    },
-                    "DependsOn": [
-                      "ProcessQueueLogGroup"
-                    ]
-                  },
-                  "ProcessQueueLambdaVersionJEs4EVJEWWPiDapQTTOZ7N7g7Gfd3ttiPYuEAA7a6aM": {
-                    "Type": "AWS::Lambda::Version",
-                    "DeletionPolicy": "Retain",
-                    "Properties": {
-                      "FunctionName": {
-                        "Ref": "ProcessQueueLambdaFunction"
-                      },
-                      "CodeSha256": "xuod3bhjrBJPFsppUUkPwTX/BMJ7slqQaVhfn57pVbA="
-                    }
-                  },
-                  "ProcessQueueEventSourceMappingSQSOrderQueue": {
-                    "Type": "AWS::Lambda::EventSourceMapping",
-                    "DependsOn": [
-                      "IamRoleLambdaExecution"
-                    ],
-                    "Properties": {
-                      "BatchSize": 10,
-                      "EventSourceArn": {
-                        "Fn::GetAtt": [
-                          "OrderQueue",
-                          "Arn"
-                        ]
-                      },
-                      "FunctionName": {
-                        "Fn::GetAtt": [
-                          "ProcessQueueLambdaFunction",
-                          "Arn"
-                        ]
-                      },
-                      "Enabled": true
-                    }
-                  },
-                  "OrderQueue": {
-                    "Type": "AWS::SQS::Queue",
-                    "Properties": {
-                      "QueueName": "Order-consumer"
-                    }
-                  }
-                },
-                "Outputs": {
-                  "ServerlessDeploymentBucketName": {
-                    "Value": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
-                    "Export": {
-                      "Name": "sls-order-consumer-dev-ServerlessDeploymentBucketName"
-                    }
-                  },
-                  "ProcessQueueLambdaFunctionQualifiedArn": {
-                    "Description": "Current Lambda function version",
-                    "Value": {
-                      "Ref": "ProcessQueueLambdaVersionJEs4EVJEWWPiDapQTTOZ7N7g7Gfd3ttiPYuEAA7a6aM"
-                    },
-                    "Export": {
-                      "Name": "sls-order-consumer-dev-ProcessQueueLambdaFunctionQualifiedArn"
-                    }
-                  }
-                }
-              },
-              "vpc": {}
-            },
-            "functions": {
-              "processQueue": {
-                "handler": "handler.consumeQueue",
-                "events": [
-                  {
-                    "sqs": {
-                      "arn": {
-                        "Fn::GetAtt": [
-                          "OrderQueue",
-                          "Arn"
-                        ]
-                      }
-                    }
-                  }
-                ],
-                "name": "order-consumer-dev-processQueue",
-                "package": {},
-                "memory": 1024,
-                "timeout": 6,
-                "runtime": "nodejs18.x",
-                "vpc": {},
-                "versionLogicalId": "ProcessQueueLambdaVersionJEs4EVJEWWPiDapQTTOZ7N7g7Gfd3ttiPYuEAA7a6aM"
-              }
-            },
-            "resources": {
-              "Resources": {
-                "OrderQueue": {
-                  "Type": "AWS::SQS::Queue",
-                  "Properties": {
-                    "QueueName": "Order-consumer"
-                  }
-                }
-              },
-              "Outputs": {}
-            }
-          },
-          "configFileDirPath": "C:\\Users\\gabri\\Área de Trabalho\\Documentos\\GitHub\\Serverless\\order-consumer",
-          "config": {
-            "type": "sls"
-          },
-          "options": {},
-          "stage": "dev",
-          "dashboard": null,
-          "logger": {
-            "namespace": "s:core:resolver:sls",
-            "prefix": null,
-            "prefixColor": null
-          },
-          "_credentialsPromise": "<REDACTED>"
-        },
-        "resolvers": {}
-      }
-    },
-    "composeServiceName": null,
-    "servicePath": "C:\\Users\\gabri\\Área de Trabalho\\Documentos\\GitHub\\Serverless\\order-consumer",
+  "C:\\Users\\gabri\\Área de Trabalho\\Documentos\\GitHub\\Serverless\\order-consumer\\serverless.yaml": {
+    "versionFramework": "4.5.1",
+    "servicePath": "C:\\Users\\gabri\\Área de Trabalho\\Documentos\\GitHub\\Serverless\\order-consumer\\serverless.yaml",
     "serviceConfigFileName": "serverless.yaml",
     "service": {
       "service": "order-consumer",
@@ -377,7 +120,7 @@
               "Properties": {
                 "Code": {
                   "S3Bucket": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
-                  "S3Key": "serverless/order-consumer/dev/1738067543337-2025-01-28T12:32:23.337Z/order-consumer.zip"
+                  "S3Key": "serverless/order-consumer/dev/1738258586236-2025-01-30T17:36:26.236Z/order-consumer.zip"
                 },
                 "Handler": "handler.consumeQueue",
                 "Runtime": "nodejs18.x",
@@ -395,14 +138,14 @@
                 "ProcessQueueLogGroup"
               ]
             },
-            "ProcessQueueLambdaVersionJEs4EVJEWWPiDapQTTOZ7N7g7Gfd3ttiPYuEAA7a6aM": {
+            "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM": {
               "Type": "AWS::Lambda::Version",
               "DeletionPolicy": "Retain",
               "Properties": {
                 "FunctionName": {
                   "Ref": "ProcessQueueLambdaFunction"
                 },
-                "CodeSha256": "xuod3bhjrBJPFsppUUkPwTX/BMJ7slqQaVhfn57pVbA="
+                "CodeSha256": "MdoUc814MjKSl6VWVgqYO2gXASH5KL6LVkz69OwtD/Y="
               }
             },
             "ProcessQueueEventSourceMappingSQSOrderQueue": {
@@ -444,7 +187,7 @@
             "ProcessQueueLambdaFunctionQualifiedArn": {
               "Description": "Current Lambda function version",
               "Value": {
-                "Ref": "ProcessQueueLambdaVersionJEs4EVJEWWPiDapQTTOZ7N7g7Gfd3ttiPYuEAA7a6aM"
+                "Ref": "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM"
               },
               "Export": {
                 "Name": "sls-order-consumer-dev-ProcessQueueLambdaFunctionQualifiedArn"
@@ -475,7 +218,7 @@
           "timeout": 6,
           "runtime": "nodejs18.x",
           "vpc": {},
-          "versionLogicalId": "ProcessQueueLambdaVersionJEs4EVJEWWPiDapQTTOZ7N7g7Gfd3ttiPYuEAA7a6aM"
+          "versionLogicalId": "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM"
         }
       },
       "resources": {
@@ -490,20 +233,198 @@
         "Outputs": {}
       }
     },
-    "serviceRawFile": "service: order-consumer\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n\r\nfunctions:\r\n  processQueue:\r\n    handler: handler.consumeQueue\r\n    events:\r\n    - sqs:\r\n        arn:\r\n          Fn::GetAtt:\r\n          - OrderQueue\r\n          - Arn\r\n\r\nresources:\r\n  Resources:\r\n    OrderQueue:\r\n      Type: AWS::SQS::Queue\r\n      Properties:\r\n        QueueName: Order-consumer\r\n",
-    "command": [
-      "deploy"
-    ],
-    "options": {},
-    "error": null,
-    "params": {},
-    "machineId": "2e6b688126bfa0a1cde62deef6d902d7",
-    "stage": "dev",
-    "accessKeyV2": "<REDACTED>",
-    "accessKeyV1": "<REDACTED>",
-    "orgId": "334898d8-7f9c-4955-b930-1af2d4562c8e",
-    "orgName": "12343",
-    "userId": "pqMWDSlRJMH5yK93Zt",
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs18.x",
+      "stage": "dev",
+      "region": "us-east-1",
+      "versionFunctions": true,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ProcessQueueLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/order-consumer-dev-processQueue"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "order-consumer",
+                        "dev",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream",
+                          "logs:CreateLogGroup",
+                          "logs:TagResource"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/order-consumer-dev*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/order-consumer-dev*:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "sqs:ReceiveMessage",
+                          "sqs:DeleteMessage",
+                          "sqs:GetQueueAttributes"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::GetAtt": [
+                              "OrderQueue",
+                              "Arn"
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "order-consumer",
+                    "dev",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "ProcessQueueLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
+                "S3Key": "serverless/order-consumer/dev/1738258586236-2025-01-30T17:36:26.236Z/order-consumer.zip"
+              },
+              "Handler": "handler.consumeQueue",
+              "Runtime": "nodejs18.x",
+              "FunctionName": "order-consumer-dev-processQueue",
+              "MemorySize": 1024,
+              "Timeout": 6,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              }
+            },
+            "DependsOn": [
+              "ProcessQueueLogGroup"
+            ]
+          },
+          "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ProcessQueueLambdaFunction"
+              },
+              "CodeSha256": "MdoUc814MjKSl6VWVgqYO2gXASH5KL6LVkz69OwtD/Y="
+            }
+          },
+          "ProcessQueueEventSourceMappingSQSOrderQueue": {
+            "Type": "AWS::Lambda::EventSourceMapping",
+            "DependsOn": [
+              "IamRoleLambdaExecution"
+            ],
+            "Properties": {
+              "BatchSize": 10,
+              "EventSourceArn": {
+                "Fn::GetAtt": [
+                  "OrderQueue",
+                  "Arn"
+                ]
+              },
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ProcessQueueLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Enabled": true
+            }
+          },
+          "OrderQueue": {
+            "Type": "AWS::SQS::Queue",
+            "Properties": {
+              "QueueName": "Order-consumer"
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
+            "Export": {
+              "Name": "sls-order-consumer-dev-ServerlessDeploymentBucketName"
+            }
+          },
+          "ProcessQueueLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM"
+            },
+            "Export": {
+              "Name": "sls-order-consumer-dev-ProcessQueueLambdaFunctionQualifiedArn"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
     "dashboard": {
       "isEnabledForService": false,
       "requiredAuthentication": false,
@@ -513,25 +434,25 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
+    "serviceRawFile": "service: order-consumer\r\n\r\nprovider:\r\n  name: aws\r\n  runtime: nodejs18.x\r\n\r\nfunctions:\r\n  processQueue:\r\n    handler: handler.consumeQueue\r\n    events:\r\n    - sqs:\r\n        arn:\r\n          Fn::GetAtt:\r\n          - OrderQueue\r\n          - Arn\r\n\r\nresources:\r\n  Resources:\r\n    OrderQueue:\r\n      Type: AWS::SQS::Queue\r\n      Properties:\r\n        QueueName: Order-consumer\r\n",
+    "command": [
+      "deploy"
+    ],
+    "options": {},
+    "orgId": "334898d8-7f9c-4955-b930-1af2d4562c8e",
+    "orgName": "12343",
+    "userId": "pqMWDSlRJMH5yK93Zt",
     "userName": "12343",
-    "subscription": null,
-    "userEmail": "gab-colombo@usp.br",
-    "serviceProviderAwsRegion": "us-east-1",
-    "serviceProviderAwsCredentials": "<REDACTED>",
     "serviceProviderAwsAccountId": "891377171965",
-    "projectType": "traditional",
-    "versionSf": "4.4.19",
     "serviceProviderAwsCfStackName": "order-consumer-dev",
-    "integrations": {},
-    "serviceUniqueId": "arn:aws:cloudformation:us-east-1:891377171965:stack/order-consumer-dev/1be04880-db1e-11ef-a572-0affd0c8c931",
     "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:891377171965:stack/order-consumer-dev/1be04880-db1e-11ef-a572-0affd0c8c931",
     "serviceProviderAwsCfStackCreated": "2025-01-25T13:13:03.613Z",
-    "serviceProviderAwsCfStackUpdated": "2025-01-28T12:33:09.461Z",
+    "serviceProviderAwsCfStackUpdated": "2025-01-30T17:27:47.891Z",
     "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
     "serviceProviderAwsCfStackOutputs": [
       {
         "OutputKey": "ProcessQueueLambdaFunctionQualifiedArn",
-        "OutputValue": "arn:aws:lambda:us-east-1:891377171965:function:order-consumer-dev-processQueue:1",
+        "OutputValue": "arn:aws:lambda:us-east-1:891377171965:function:order-consumer-dev-processQueue:22",
         "Description": "Current Lambda function version",
         "ExportName": "sls-order-consumer-dev-ProcessQueueLambdaFunctionQualifiedArn"
       },
@@ -540,6 +461,190 @@
         "OutputValue": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
         "ExportName": "sls-order-consumer-dev-ServerlessDeploymentBucketName"
       }
-    ]
+    ],
+    "compiledCloudFormationTemplate": {
+      "AWSTemplateFormatVersion": "2010-09-09",
+      "Description": "The AWS CloudFormation template for this Serverless application",
+      "Resources": {
+        "ProcessQueueLogGroup": {
+          "Type": "AWS::Logs::LogGroup",
+          "Properties": {
+            "LogGroupName": "/aws/lambda/order-consumer-dev-processQueue"
+          }
+        },
+        "IamRoleLambdaExecution": {
+          "Type": "AWS::IAM::Role",
+          "Properties": {
+            "AssumeRolePolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Principal": {
+                    "Service": [
+                      "lambda.amazonaws.com"
+                    ]
+                  },
+                  "Action": [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Policies": [
+              {
+                "PolicyName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "order-consumer",
+                      "dev",
+                      "lambda"
+                    ]
+                  ]
+                },
+                "PolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:CreateLogStream",
+                        "logs:CreateLogGroup",
+                        "logs:TagResource"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/order-consumer-dev*:*"
+                        }
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "logs:PutLogEvents"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/order-consumer-dev*:*:*"
+                        }
+                      ]
+                    },
+                    {
+                      "Effect": "Allow",
+                      "Action": [
+                        "sqs:ReceiveMessage",
+                        "sqs:DeleteMessage",
+                        "sqs:GetQueueAttributes"
+                      ],
+                      "Resource": [
+                        {
+                          "Fn::GetAtt": [
+                            "OrderQueue",
+                            "Arn"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "Path": "/",
+            "RoleName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "order-consumer",
+                  "dev",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  "lambdaRole"
+                ]
+              ]
+            }
+          }
+        },
+        "ProcessQueueLambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+            "Code": {
+              "S3Bucket": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
+              "S3Key": "serverless/order-consumer/dev/1738258586236-2025-01-30T17:36:26.236Z/order-consumer.zip"
+            },
+            "Handler": "handler.consumeQueue",
+            "Runtime": "nodejs18.x",
+            "FunctionName": "order-consumer-dev-processQueue",
+            "MemorySize": 1024,
+            "Timeout": 6,
+            "Role": {
+              "Fn::GetAtt": [
+                "IamRoleLambdaExecution",
+                "Arn"
+              ]
+            }
+          },
+          "DependsOn": [
+            "ProcessQueueLogGroup"
+          ]
+        },
+        "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM": {
+          "Type": "AWS::Lambda::Version",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "FunctionName": {
+              "Ref": "ProcessQueueLambdaFunction"
+            },
+            "CodeSha256": "MdoUc814MjKSl6VWVgqYO2gXASH5KL6LVkz69OwtD/Y="
+          }
+        },
+        "ProcessQueueEventSourceMappingSQSOrderQueue": {
+          "Type": "AWS::Lambda::EventSourceMapping",
+          "DependsOn": [
+            "IamRoleLambdaExecution"
+          ],
+          "Properties": {
+            "BatchSize": 10,
+            "EventSourceArn": {
+              "Fn::GetAtt": [
+                "OrderQueue",
+                "Arn"
+              ]
+            },
+            "FunctionName": {
+              "Fn::GetAtt": [
+                "ProcessQueueLambdaFunction",
+                "Arn"
+              ]
+            },
+            "Enabled": true
+          }
+        },
+        "OrderQueue": {
+          "Type": "AWS::SQS::Queue",
+          "Properties": {
+            "QueueName": "Order-consumer"
+          }
+        }
+      },
+      "Outputs": {
+        "ServerlessDeploymentBucketName": {
+          "Value": "serverless-framework-deployments-us-east-1-29b64f31-2b0a",
+          "Export": {
+            "Name": "sls-order-consumer-dev-ServerlessDeploymentBucketName"
+          }
+        },
+        "ProcessQueueLambdaFunctionQualifiedArn": {
+          "Description": "Current Lambda function version",
+          "Value": {
+            "Ref": "ProcessQueueLambdaVersion3jZuf03LZ7Jmaylu0mngZW42MzYNnX5ABHDTkPEWfM"
+          },
+          "Export": {
+            "Name": "sls-order-consumer-dev-ProcessQueueLambdaFunctionQualifiedArn"
+          }
+        }
+      }
+    }
   }
 }
