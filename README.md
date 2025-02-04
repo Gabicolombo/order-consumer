@@ -1,0 +1,1 @@
+This repository contains a Lambda consumer that processes messages from an AWS SQS queue. It is related to [this repository](https://github.com/Gabicolombo/e-commerce) and is responsible for updating the product collection and changing the order status to either "completed" or "failed".
